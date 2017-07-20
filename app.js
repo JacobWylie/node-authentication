@@ -42,8 +42,8 @@ app.set('view engine', 'ejs');
 // ROOT Route
 app.get('/', (req, res) => res.render('home'));
 
-// Secret Route
-app.get('/secret', (req, res) => res.render('secret'));
+// Secret Route if user is logged in
+app.get('/secret', isLoggedIn, (req, res) => res.render('secret'));
 
 
 // AUTHENTICATION ROUTES
@@ -80,6 +80,27 @@ app.post('/login', passport.authenticate('local', {
 	successRedirect: '/secret',
 	failureRedirect: '/login'
 }), (req, res) => console.log('yo'));
+
+
+// LOGOUT ROUTES
+
+app.get('/logout', (req, res) => {
+	req.logout();
+	res.redirect('/');
+})
+
+
+
+/////////////////////////////////////////////
+// Logged in Middleware
+/////////////////////////////////////////////
+function isLoggedIn(req, res, next) {
+	if(req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/login');
+}
+
 
 /////////////////////////////////////////////
 // Server
