@@ -31,6 +31,9 @@ passport.serializeUser(User.serializeUser());
 // Decodes session data
 passport.deserializeUser(User.deserializeUser());
 
+// Body parser for POST data
+app.use(bodyParser.urlencoded({extended: true}));
+
 // EJS Templating
 app.set('view engine', 'ejs');
 
@@ -44,6 +47,29 @@ app.get('/', (req, res) => res.render('home'));
 // Secret Route
 app.get('/secret', (req, res) => res.render('secret'));
 
+// Authentication Routes
+// Show sign up form
+app.get('/register', (req, res) => res.render('register'));
+// Handles user signup
+app.post('/register', (req, res) => {
+	req.body.username
+	req.body.password
+	// Make a new user object
+	// Save only username to database
+	// Passes the password to User.register
+	// User.register will hash the password
+	// Returns new user with name and hashed password
+	User.register(new User({username: req.body.username}), req.body.password, (err, user) => {
+		if(err) {
+			console.log(err);
+			return res.render('register');
+		}
+		// Logs user in with new user info
+		// Uses local 'strategy'
+		passport.authenticate('local')(req, res, () => res.redirect('/secret'));
+	});
+});
+
 
 /////////////////////////////////////////////
 // Server
@@ -51,3 +77,27 @@ app.get('/secret', (req, res) => res.render('secret'));
 
 //local server
 app.listen(3000, () => console.log('App running on localhost:3000'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
