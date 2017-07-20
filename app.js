@@ -10,11 +10,6 @@ const express  				= require('express'),
 // Mongoose/MongoDB database
 mongoose.connect("mongodb://localhost/node_auth_demo", {useMongoClient: true});
 
-
-/////////////////////////////////////////////
-// Middleware
-/////////////////////////////////////////////
-
 // ExpressJS/Mongoose Session Storage
 app.use(require('express-session')({
 	secret: "I'm on a mexican radio",
@@ -26,6 +21,8 @@ app.use(require('express-session')({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Uses local db strategy for user authentication
+passport.use(new LocalStrategy(User.authenticate()));
 // Encodes session data
 passport.serializeUser(User.serializeUser());
 // Decodes session data
@@ -37,6 +34,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 // EJS Templating
 app.set('view engine', 'ejs');
 
+
 /////////////////////////////////////////////
 // Routes
 /////////////////////////////////////////////
@@ -47,7 +45,9 @@ app.get('/', (req, res) => res.render('home'));
 // Secret Route
 app.get('/secret', (req, res) => res.render('secret'));
 
-// Authentication Routes
+
+// AUTHENTICATION ROUTES
+
 // Show sign up form
 app.get('/register', (req, res) => res.render('register'));
 // Handles user signup
@@ -70,6 +70,16 @@ app.post('/register', (req, res) => {
 	});
 });
 
+
+// LOGIN ROUTES
+
+// Login form
+app.get('/login', (req, res) => res.render('login'));
+
+app.post('/login', passport.authenticate('local', {
+	successRedirect: '/secret',
+	failureRedirect: '/login'
+}), (req, res) => console.log('yo'));
 
 /////////////////////////////////////////////
 // Server
